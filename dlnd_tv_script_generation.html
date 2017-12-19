@@ -12561,6 +12561,10 @@ Default GPU Device: /gpu:0
     <span class="c1">#convert int_text to array and chop off incomplete groups</span>
     <span class="n">num_words</span>  <span class="o">=</span> <span class="p">(</span><span class="n">num_batches</span> <span class="o">*</span> <span class="n">batch_size</span> <span class="o">*</span> <span class="n">seq_length</span><span class="p">)</span>
     <span class="n">int_text</span>   <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">int_text</span><span class="p">)[:</span><span class="n">num_words</span><span class="p">]</span>
+    
+    <span class="c1">#so the last word in the last sequence has a target of the first word</span>
+    <span class="c1">#[18, 1] example from above</span>
+    <span class="n">int_text</span>   <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">int_text</span><span class="p">,</span> <span class="n">int_text</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> 
 
 
     <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_batches</span><span class="p">):</span>
@@ -12569,14 +12573,8 @@ Default GPU Device: /gpu:0
             <span class="n">seq_end</span>   <span class="o">=</span> <span class="p">(</span> <span class="n">seq_length</span> <span class="o">*</span> <span class="p">(</span> <span class="n">num_batches</span> <span class="o">*</span> <span class="n">size</span> <span class="o">+</span> <span class="n">batch</span> <span class="p">)</span> <span class="p">)</span> <span class="o">+</span> <span class="n">seq_length</span>
             
             <span class="n">batches</span><span class="p">[</span><span class="n">batch</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">size</span><span class="p">]</span> <span class="o">=</span> <span class="n">int_text</span><span class="p">[</span><span class="n">seq_start</span> <span class="p">:</span> <span class="n">seq_end</span><span class="p">]</span>
+            <span class="n">batches</span><span class="p">[</span><span class="n">batch</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="p">]</span> <span class="o">=</span> <span class="n">int_text</span><span class="p">[</span><span class="n">seq_start</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">seq_end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
             
-            <span class="k">if</span><span class="p">(</span> <span class="p">(</span><span class="n">seq_end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;=</span>  <span class="n">int_text</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">):</span>
-                <span class="n">batches</span><span class="p">[</span><span class="n">batch</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="p">]</span> <span class="o">=</span> <span class="n">int_text</span><span class="p">[</span><span class="n">seq_start</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">seq_end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
-            
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">last_targets</span> <span class="o">=</span> <span class="n">int_text</span><span class="p">[</span><span class="n">seq_start</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">seq_end</span><span class="p">]</span>
-                <span class="n">last_targets</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">last_targets</span><span class="p">,</span> <span class="n">int_text</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-                <span class="n">batches</span><span class="p">[</span><span class="n">batch</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="p">]</span> <span class="o">=</span> <span class="n">last_targets</span>
     
     <span class="k">return</span> <span class="n">batches</span>
 
